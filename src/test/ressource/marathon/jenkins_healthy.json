@@ -1,0 +1,145 @@
+{
+
+  "apps": [
+    {
+      "id": "/myproject/jenkins",
+      "cmd": null,
+      "args": null,
+      "user": null,
+      "env": { },
+      "instances": 1,
+      "cpus": 0.5,
+      "mem": 256,
+      "disk": 0,
+      "executor": "",
+      "constraints": [
+        [
+          "type",
+          "LIKE",
+          "operator"
+        ]
+      ],
+      "uris": [ ],
+      "fetch": [ ],
+      "storeUrls": [ ],
+      "ports": [
+        10004
+      ],
+      "portDefinitions": [
+        {
+          "port": 10004,
+          "protocol": "tcp",
+          "labels": { }
+        }
+      ],
+      "requirePorts": false,
+      "backoffSeconds": 1,
+      "backoffFactor": 1.15,
+      "maxLaunchDelaySeconds": 3600,
+      "container": {
+        "type": "DOCKER",
+        "volumes": [ ],
+        "docker": {
+          "image": "grafana/grafana:3.0.1",
+          "network": "BRIDGE",
+          "portMappings": [
+            {
+              "containerPort": 3000,
+              "hostPort": 13000,
+              "servicePort": 10004,
+              "protocol": "tcp",
+              "labels": {
+                "applicationProtocol": "HTTPS"
+              }
+            }
+          ],
+          "privileged": false,
+          "parameters": [
+            {
+              "key": "label",
+              "value": "componentType=monitoring"
+            },
+            {
+              "key": "label",
+              "value": "component=grafana"
+            },
+            {
+              "key": "log-opt",
+              "value": "tag=blue-grafana"
+            }
+          ],
+          "forcePullImage": false
+        }
+      },
+      "healthChecks": [
+        {
+          "path": "/",
+          "protocol": "HTTP",
+          "portIndex": 0,
+          "gracePeriodSeconds": 180,
+          "intervalSeconds": 20,
+          "timeoutSeconds": 20,
+          "maxConsecutiveFailures": 10,
+          "ignoreHttp1xx": false
+        }
+      ],
+      "readinessChecks": [ ],
+      "dependencies": [ ],
+      "upgradeStrategy": {
+        "minimumHealthCapacity": 1,
+        "maximumOverCapacity": 1
+      },
+      "labels": {
+        "project": "kodokojo",
+        "managedByKodoKojoHa": "true",
+        "componentType": "monitoring",
+        "component": "grafana"
+      },
+      "acceptedResourceRoles": null,
+      "ipAddress": null,
+      "version": "2016-10-04T09:01:10.149Z",
+      "residency": null,
+      "versionInfo": {
+        "lastScalingAt": "2016-10-04T09:01:10.149Z",
+        "lastConfigChangeAt": "2016-10-04T09:01:10.149Z"
+      },
+      "tasksStaged": 0,
+      "tasksRunning": 1,
+      "tasksHealthy": 1,
+      "tasksUnhealthy": 0,
+      "deployments": [ ],
+      "tasks": [
+        {
+          "id": "blue_grafana.180114ed-8a11-11e6-a22a-06ed602014ad",
+          "slaveId": "2ce72106-b586-457f-b183-a6b652b303ed-S0",
+          "host": "10.10.78.34",
+          "startedAt": "2016-10-04T09:01:31.726Z",
+          "stagedAt": "2016-10-04T09:01:10.331Z",
+          "ports": [
+            13000
+          ],
+          "version": "2016-10-04T09:01:10.149Z",
+          "ipAddresses": [
+            {
+              "ipAddress": "172.17.0.2",
+              "protocol": "IPv4"
+            }
+          ],
+          "appId": "/blue/grafana",
+          "healthCheckResults": [
+            {
+              "alive": true,
+              "consecutiveFailures": 0,
+              "firstSuccess": "2016-10-05T15:14:21.805Z",
+              "lastFailure": null,
+              "lastSuccess": "2016-10-14T18:14:29.959Z",
+              "lastFailureCause": null,
+              "taskId": "blue_grafana.180114ed-8a11-11e6-a22a-06ed602014ad"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+
+}
