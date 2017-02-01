@@ -2,6 +2,8 @@ package io.kodokojo.monitor.service.marathon;
 
 import io.kodokojo.commons.config.MarathonConfig;
 import io.kodokojo.commons.model.BrickType;
+import io.kodokojo.commons.model.ProjectConfiguration;
+import io.kodokojo.commons.model.ProjectConfigurationBuilder;
 import io.kodokojo.commons.service.DefaultBrickFactory;
 import io.kodokojo.commons.service.actor.message.BrickStateEvent;
 import io.kodokojo.commons.service.repository.ProjectFetcher;
@@ -34,6 +36,10 @@ public class MarathonBrickStateLookupTest implements MonitorDataBuilder, DataBui
         projectFetcher = mock(ProjectFetcher.class);
 
         when(projectFetcher.getProjectConfigurationByName("myproject")).thenReturn(aProjectConfiguration());
+        ProjectConfigurationBuilder builder = new ProjectConfigurationBuilder(aProjectConfiguration());
+        builder.setName("bisproject");
+        builder.setIdentifier("0123ss");
+        when(projectFetcher.getProjectConfigurationByName("bisproject")).thenReturn(builder.build());
 
         httpClient = mock(OkHttpClient.class);
     }

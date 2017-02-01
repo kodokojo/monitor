@@ -402,156 +402,6 @@
       ]
     },
     {
-      "id": "/myproject/jenkins",
-      "cmd": null,
-      "args": null,
-      "user": null,
-      "env": { },
-      "instances": 0,
-      "cpus": 0.5,
-      "mem": 256,
-      "disk": 0,
-      "executor": "",
-      "constraints": [
-        [
-          "type",
-          "LIKE",
-          "operator"
-        ]
-      ],
-      "uris": [ ],
-      "fetch": [ ],
-      "storeUrls": [ ],
-      "ports": [
-        10001,
-        10002,
-        10003
-      ],
-      "portDefinitions": [
-        {
-          "port": 10001,
-          "protocol": "tcp",
-          "labels": { }
-        },
-        {
-          "port": 10002,
-          "protocol": "tcp",
-          "labels": { }
-        },
-        {
-          "port": 10003,
-          "protocol": "tcp",
-          "labels": { }
-        }
-      ],
-      "requirePorts": false,
-      "backoffSeconds": 1,
-      "backoffFactor": 1.15,
-      "maxLaunchDelaySeconds": 3600,
-      "container": {
-        "type": "DOCKER",
-        "volumes": [ ],
-        "docker": {
-          "image": "tutum/influxdb:0.13",
-          "network": "BRIDGE",
-          "portMappings": [
-            {
-              "containerPort": 8083,
-              "hostPort": 0,
-              "servicePort": 10001,
-              "protocol": "tcp",
-              "labels": { }
-            },
-            {
-              "containerPort": 8086,
-              "hostPort": 0,
-              "servicePort": 10002,
-              "protocol": "tcp",
-              "labels": { }
-            },
-            {
-              "containerPort": 25826,
-              "hostPort": 0,
-              "servicePort": 10003,
-              "protocol": "udp",
-              "labels": { }
-            }
-          ],
-          "privileged": false,
-          "parameters": [
-            {
-              "key": "label",
-              "value": "componentType=monitoring"
-            },
-            {
-              "key": "label",
-              "value": "component=influxdb"
-            },
-            {
-              "key": "env",
-              "value": "ADMIN_USER=admin"
-            },
-            {
-              "key": "env",
-              "value": "INFLUXDB_INIT_PWD=admin"
-            },
-            {
-              "key": "env",
-              "value": "PRE_CREATE_DB=infra"
-            },
-            {
-              "key": "env",
-              "value": "COLLECTD_DB=infra"
-            },
-            {
-              "key": "env",
-              "value": "COLLECTD_BINDING=:25826"
-            }
-          ],
-          "forcePullImage": false
-        }
-      },
-      "healthChecks": [
-        {
-          "path": "/",
-          "protocol": "HTTP",
-          "portIndex": 0,
-          "gracePeriodSeconds": 180,
-          "intervalSeconds": 20,
-          "timeoutSeconds": 20,
-          "maxConsecutiveFailures": 10,
-          "ignoreHttp1xx": false
-        }
-      ],
-      "readinessChecks": [ ],
-      "dependencies": [ ],
-      "upgradeStrategy": {
-        "minimumHealthCapacity": 1,
-        "maximumOverCapacity": 1
-      },
-      "labels": {
-        "componentType": "monitoring",
-        "managedByKodoKojoHa": "true",
-        "component": "influxdb"
-      },
-      "acceptedResourceRoles": null,
-      "ipAddress": null,
-      "version": "2016-10-03T22:06:50.359Z",
-      "residency": null,
-      "versionInfo": {
-        "lastScalingAt": "2016-10-03T22:06:50.359Z",
-        "lastConfigChangeAt": "2016-10-03T22:06:50.359Z"
-      },
-      "tasksStaged": 0,
-      "tasksRunning": 0,
-      "tasksHealthy": 0,
-      "tasksUnhealthy": 0,
-      "deployments": [ ],
-      "tasks": [
-
-      ]
-    },
-    {
       "id": "/kodokojo/back",
       "cmd": null,
       "args": null,
@@ -1272,6 +1122,138 @@
             }
           ]
         }
+      ]
+    },
+    {
+      "id": "/bisproject/jenkins",
+      "cmd": null,
+      "args": null,
+      "user": null,
+      "env": { },
+      "instances": 0,
+      "cpus": 0.5,
+      "mem": 1024,
+      "disk": 0,
+      "executor": "",
+      "constraints": [
+        [
+          "type",
+          "LIKE",
+          "operator"
+        ]
+      ],
+      "uris": [ ],
+      "fetch": [ ],
+      "storeUrls": [ ],
+      "ports": [
+        10009
+      ],
+      "portDefinitions": [
+        {
+          "port": 10009,
+          "protocol": "tcp",
+          "labels": { }
+        }
+      ],
+      "requirePorts": false,
+      "backoffSeconds": 0,
+      "backoffFactor": 1.15,
+      "maxLaunchDelaySeconds": 3600,
+      "container": {
+        "type": "DOCKER",
+        "volumes": [
+          {
+            "containerPath": "/var/jenkins_home/",
+            "hostPath": "/kodokojo/env/bisproject/jenkins/",
+            "mode": "RW"
+          }
+        ],
+        "docker": {
+          "image": "jenkins:1.651.3-alpine",
+          "network": "BRIDGE",
+          "portMappings": [
+            {
+              "containerPort": 8080,
+              "hostPort": 0,
+              "servicePort": 10009,
+              "protocol": "tcp",
+              "labels": {
+                "applicationProtocol": "HTTPS"
+              }
+            }
+          ],
+          "privileged": false,
+          "parameters": [
+            {
+              "key": "env",
+              "value": "JENKINS_SLAVE_AGENT_PORT=50000"
+            },
+            {
+              "key": "env",
+              "value": "JAVA_OPTS=-Duser.timezone=Europe/Paris"
+            },
+            {
+              "key": "label",
+              "value": "endpoint=xebia"
+            },
+            {
+              "key": "label",
+              "value": "componentType=ci"
+            },
+            {
+              "key": "label",
+              "value": "component=jenkins"
+            },
+            {
+              "key": "user",
+              "value": "root"
+            },
+            {
+              "key": "log-opt",
+              "value": "tag=jenkins-kodokojo"
+            }
+          ],
+          "forcePullImage": false
+        }
+      },
+      "healthChecks": [
+        {
+          "path": "/",
+          "protocol": "HTTP",
+          "portIndex": 0,
+          "gracePeriodSeconds": 180,
+          "intervalSeconds": 20,
+          "timeoutSeconds": 20,
+          "maxConsecutiveFailures": 10,
+          "ignoreHttp1xx": false
+        }
+      ],
+      "readinessChecks": [ ],
+      "dependencies": [ ],
+      "upgradeStrategy": {
+        "minimumHealthCapacity": 1,
+        "maximumOverCapacity": 1
+      },
+      "labels": {
+        "endpoint": "xebia",
+        "managedByKodoKojoHa": "true",
+        "componentType": "ci",
+        "component": "jenkins"
+      },
+      "acceptedResourceRoles": null,
+      "ipAddress": null,
+      "version": "2016-10-14T14:58:55.183Z",
+      "residency": null,
+      "versionInfo": {
+        "lastScalingAt": "2016-10-14T14:58:55.183Z",
+        "lastConfigChangeAt": "2016-10-14T14:58:55.183Z"
+      }, "tasksStaged": 0,
+      "tasksRunning": 0,
+      "tasksHealthy": 0,
+      "tasksUnhealthy": 0,
+      "deployments": [ ],
+      "tasks": [
+
       ]
     }
   ]
