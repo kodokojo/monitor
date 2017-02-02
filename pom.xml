@@ -481,7 +481,7 @@
                             </filters>
                             <transformers>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>io.kodokojo.brickmanager.Launcher</mainClass>
+                                    <mainClass>io.kodokojo.monitor.Launcher</mainClass>
                                 </transformer>
                             </transformers>
                         </configuration>

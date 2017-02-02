@@ -17,10 +17,36 @@
  */
 package io.kodokojo.monitor;
 
+import akka.actor.ActorRef;
+import akka.actor.ActorSystem;
+import com.google.inject.*;
+import io.kodokojo.commons.config.MarathonConfig;
+import io.kodokojo.commons.config.MicroServiceConfig;
+import io.kodokojo.commons.config.module.*;
+import io.kodokojo.commons.event.EventBus;
+import io.kodokojo.commons.model.BrickType;
+import io.kodokojo.commons.service.BrickFactory;
+import io.kodokojo.commons.service.actor.message.BrickStateEvent;
+import io.kodokojo.commons.service.lifecycle.ApplicationLifeCycleManager;
+import io.kodokojo.commons.service.repository.ProjectFetcher;
+import io.kodokojo.monitor.config.module.PropertyModule;
+import io.kodokojo.monitor.config.module.ServiceModule;
+import io.kodokojo.monitor.service.BrickStateLookup;
+import io.kodokojo.monitor.service.marathon.MarathonBrickStateLookup;
+import okhttp3.OkHttpClient;
+import org.apache.commons.lang.math.RandomUtils;
+import org.slf4j.LoggerFactory;
+import scala.concurrent.duration.Duration;
+
+import java.util.Collections;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
+
 public class Launcher {
-/*
-    private static final Logger LOGGER = LoggerFactory.getLogger(Launcher.class);
-    public static final String MOCK = "mock";
+
+    private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(Launcher.class);
+
+    private static final String MOCK = "mock";
 
     public static void main(String[] args) {
 
@@ -28,37 +54,63 @@ public class Launcher {
         Injector propertyInjector = Guice.createInjector(new CommonsPropertyModule(args), new PropertyModule());
         MicroServiceConfig microServiceConfig = propertyInjector.getInstance(MicroServiceConfig.class);
         LOGGER.info("Starting Kodo Kojo {}.", microServiceConfig.name());
-        Injector servicesInjector = propertyInjector.createChildInjector(new UtilityServiceModule(), new EventBusModule(), new DatabaseModule(), new SecurityModule(), new ServiceModule());
-        Module orchestratorModule = new MarathonModule();
+        Injector commonsServicesInjector = propertyInjector.createChildInjector(new UtilityServiceModule(), new EventBusModule(), new DatabaseModule(), new SecurityModule());
 
-        Injector orchestratorInjector = servicesInjector.createChildInjector(orchestratorModule);
-        Injector akkaInjector = orchestratorInjector.createChildInjector(new AkkaModule());
-        ActorSystem actorSystem = akkaInjector.getInstance(ActorSystem.class);
-        ActorRef endpointActor = actorSystem.actorOf(EndpointActor.PROPS(akkaInjector), "endpoint");
-        akkaInjector = akkaInjector.createChildInjector(new AbstractModule() {
-            @Override
-            protected void configure() {
-                bind(ActorRef.class).annotatedWith(Names.named(EndpointActor.NAME)).toInstance(endpointActor);
-            }
-        });
+        Injector marathonInjector = null;
+        OrchestratorConfig orchestratorConfig = propertyInjector.getInstance(OrchestratorConfig.class);
+        if (MOCK.equals(orchestratorConfig.orchestrator())) {
+            marathonInjector = commonsServicesInjector.createChildInjector(new AbstractModule() {
+                @Override
+                protected void configure() {
+                    //
+                }
 
-        Injector injector = akkaInjector.createChildInjector(new AbstractModule() {
-            @Override
-            protected void configure() {
-                //
-            }
+                @Singleton
+                @Provides
+                BrickStateLookup provideBrickStateLookup() {
+                    return new BrickStateLookup() {
 
-            @Provides
-            @Singleton
-            EventToEndpointGateway provideEventEventToEndpointGateway(@Named(EndpointActor.NAME) ActorRef akkaEndpoint) {
-                return new EventToEndpointGateway(akkaEndpoint);
-            }
+                        private int cpt = 0;
 
-        });
+                        @Override
+                        public Set<BrickStateEvent> lookup() {
+                            return Collections.singleton(generateBrickStateEvent());
+                        }
 
-        EventBus eventBus = injector.getInstance(EventBus.class);
-        EventToEndpointGateway eventToActorGateway = injector.getInstance(EventToEndpointGateway.class);
-        eventBus.addEventListener(eventToActorGateway);
+                        public BrickStateEvent generateBrickStateEvent() {
+                            BrickStateEvent.State[] states = BrickStateEvent.State.values();
+                            int index = RandomUtils.nextInt(states.length);
+                            BrickStateEvent.State state = states[index];
+
+                            return new BrickStateEvent(
+                                    "1234",
+                                    "build-A",
+                                    BrickType.CI.name(),
+                                    "jenkins",
+                                    state,
+                                    "1.65Z3.1"
+                            );
+                        }
+                    };
+                }
+            });
+        } else {
+            marathonInjector = commonsServicesInjector.createChildInjector(new AbstractModule() {
+                @Override
+                protected void configure() {
+                    //
+                }
+
+                @Singleton
+                @Provides
+                BrickStateLookup provideBrickStateLookup(MarathonConfig marathonConfig, ProjectFetcher projectFectcher, BrickFactory brickFactory, OkHttpClient httpClient) {
+                    return new MarathonBrickStateLookup(marathonConfig, projectFectcher, brickFactory, httpClient);
+                }
+
+            });
+        }
+
+        Injector servicesInjector = marathonInjector.createChildInjector(new ServiceModule());
 
         ApplicationLifeCycleManager applicationLifeCycleManager = servicesInjector.getInstance(ApplicationLifeCycleManager.class);
         Runtime.getRuntime().addShutdownHook(new Thread() {
@@ -70,11 +122,15 @@ public class Launcher {
                 LOGGER.info("All services stopped.");
             }
         });
+
+        EventBus eventBus = servicesInjector.getInstance(EventBus.class);
         eventBus.connect();
 
+        ActorSystem actorSystem = servicesInjector.getInstance(ActorSystem.class);
+        ActorRef actorRef = servicesInjector.getInstance(ActorRef.class);
+        actorSystem.scheduler().schedule(Duration.Zero(), Duration.create(1, TimeUnit.MINUTES), actorRef, "Tick", actorSystem.dispatcher(), ActorRef.noSender());
         LOGGER.info("Kodo Kojo {} started.", microServiceConfig.name());
 
     }
-*/
 
 }

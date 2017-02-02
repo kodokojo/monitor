@@ -35,6 +35,6 @@ fi
 
 mkdir -p target/docker | true
 cp src/main/docker/local/Dockerfile target/docker/
-artifact=$(ls target | egrep brick-manager-.*-runnable.jar)
+artifact=$(ls target | egrep monitor-.*-runnable.jar)
 cp target/$artifact target/docker/kodokojo.jar
 docker build -t="kodokojo/monitor" target/docker/
