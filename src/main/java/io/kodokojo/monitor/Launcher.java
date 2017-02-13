@@ -31,6 +31,7 @@ import io.kodokojo.commons.service.lifecycle.ApplicationLifeCycleManager;
 import io.kodokojo.commons.service.repository.ProjectFetcher;
 import io.kodokojo.monitor.config.module.PropertyModule;
 import io.kodokojo.monitor.config.module.ServiceModule;
+import io.kodokojo.monitor.service.BrickStateEventRepository;
 import io.kodokojo.monitor.service.BrickStateLookup;
 import io.kodokojo.monitor.service.marathon.MarathonBrickStateLookup;
 import okhttp3.OkHttpClient;
@@ -125,6 +126,12 @@ public class Launcher {
 
         EventBus eventBus = servicesInjector.getInstance(EventBus.class);
         eventBus.connect();
+        //  Init repository.
+        BrickStateLookup brickStateLookup = servicesInjector.getInstance(BrickStateLookup.class);
+        BrickStateEventRepository repository = servicesInjector.getInstance(BrickStateEventRepository.class);
+        Set<BrickStateEvent> brickStateEvents = brickStateLookup.lookup();
+        repository.compareAndUpdate(brickStateEvents);
+
 
         ActorSystem actorSystem = servicesInjector.getInstance(ActorSystem.class);
         ActorRef actorRef = servicesInjector.getInstance(ActorRef.class);
