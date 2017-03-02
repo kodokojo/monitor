@@ -39,12 +39,10 @@ public class LookupOrchestratorAndFireEventActor extends AbstractActor {
             if (isNotEmpty(brickStateEvents)) {
                 LOGGER.info("Sending {} brick state event changed.", brickStateEvents.size());
                 EventBuilder builder = eventBuilderFactory.create();
+                builder.setEventType(Event.BRICK_STATE_UPDATE);
                 brickStateEventsToSend.forEach(brickStateEvent -> {
-
-                    builder.setEventType(Event.BRICK_STATE_UPDATE)
-                            .setPayload(brickStateEvent);
+                    builder.setPayload(brickStateEvent);
                     eventBus.send(builder.build());
-
                 });
             }
         }).matchAny(this::unhandled)

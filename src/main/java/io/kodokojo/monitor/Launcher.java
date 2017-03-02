@@ -27,6 +27,7 @@ import io.kodokojo.commons.event.EventBus;
 import io.kodokojo.commons.model.BrickType;
 import io.kodokojo.commons.service.BrickFactory;
 import io.kodokojo.commons.service.actor.message.BrickStateEvent;
+import io.kodokojo.commons.service.healthcheck.HttpHealthCheckEndpoint;
 import io.kodokojo.commons.service.lifecycle.ApplicationLifeCycleManager;
 import io.kodokojo.commons.service.repository.ProjectFetcher;
 import io.kodokojo.monitor.config.module.PropertyModule;
@@ -55,7 +56,13 @@ public class Launcher {
         Injector propertyInjector = Guice.createInjector(new CommonsPropertyModule(args), new PropertyModule());
         MicroServiceConfig microServiceConfig = propertyInjector.getInstance(MicroServiceConfig.class);
         LOGGER.info("Starting Kodo Kojo {}.", microServiceConfig.name());
-        Injector commonsServicesInjector = propertyInjector.createChildInjector(new UtilityServiceModule(), new EventBusModule(), new DatabaseModule(), new SecurityModule());
+        Injector commonsServicesInjector = propertyInjector.createChildInjector(
+                new UtilityServiceModule(),
+                new EventBusModule(),
+                new DatabaseModule(),
+                new SecurityModule(),
+                new CommonsHealthCheckModule()
+        );
 
         Injector marathonInjector = null;
         OrchestratorConfig orchestratorConfig = propertyInjector.getInstance(OrchestratorConfig.class);
@@ -132,6 +139,9 @@ public class Launcher {
         Set<BrickStateEvent> brickStateEvents = brickStateLookup.lookup();
         repository.compareAndUpdate(brickStateEvents);
 
+
+        HttpHealthCheckEndpoint httpHealthCheckEndpoint = servicesInjector.getInstance(HttpHealthCheckEndpoint.class);
+        httpHealthCheckEndpoint.start();
 
         ActorSystem actorSystem = servicesInjector.getInstance(ActorSystem.class);
         ActorRef actorRef = servicesInjector.getInstance(ActorRef.class);
