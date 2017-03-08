@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.io.IOException;
+import java.util.Base64;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -76,7 +77,7 @@ public class MarathonBrickStateLookup implements BrickStateLookup {
     }
 
     private Optional<BrickStateEvent> processMarathonApplication(JsonObject app) {
-        if (    app.has(ID) &&
+        if (app.has(ID) &&
                 app.has(LABELS) &&
                 app.getAsJsonObject(LABELS).has(MANAGED_BY_KODO_KOJO_HA) &&
                 app.getAsJsonObject(LABELS).getAsJsonPrimitive(MANAGED_BY_KODO_KOJO_HA).getAsBoolean()
@@ -140,6 +141,10 @@ public class MarathonBrickStateLookup implements BrickStateLookup {
     protected String fetchMarathon() {
         Request.Builder requestBuilder = new Request.Builder();
         Request.Builder builder = requestBuilder.url(marathonConfig.url() + V2_APPS_PATH).get();
+        if (StringUtils.isNotBlank(marathonConfig.login())) {
+            String basicAuthenticationValue = "Basic " + Base64.getEncoder().encodeToString(String.format("%s:%s", marathonConfig.login(), marathonConfig.password()).getBytes());
+            builder.addHeader("Authorization", basicAuthenticationValue);
+        }
         Request request = builder.build();
         Response response = null;
         try {
