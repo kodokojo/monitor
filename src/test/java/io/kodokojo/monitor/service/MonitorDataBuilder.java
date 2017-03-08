@@ -57,7 +57,7 @@ public interface MonitorDataBuilder {
         initialBrickStateEvents.add(new BrickStateEvent(projectConfigurationIdentifier, stackName, BrickType.CI.name(), "jenkins", BrickStateEvent.State.RUNNING, "1.651.3"));
         initialBrickStateEvents.add(new BrickStateEvent("0123ss", stackName, BrickType.CI.name(), "jenkins", BrickStateEvent.State.STOPPED, "1.651.3"));
         initialBrickStateEvents.add(new BrickStateEvent(projectConfigurationIdentifier, stackName, BrickType.REPOSITORY.name(), "nexus", BrickStateEvent.State.ONFAILURE, "2.13"));
-        initialBrickStateEvents.add(new BrickStateEvent(projectConfigurationIdentifier, stackName, BrickType.SCM.name(), "gitlab", BrickStateEvent.State.STARTING, "8.13.0-ce.0"));
+        initialBrickStateEvents.add(new BrickStateEvent(projectConfigurationIdentifier, stackName, BrickType.SCM.name(), "gitlab", BrickStateEvent.State.STARTING, "8.17.2-ce.0"));
         return  initialBrickStateEvents;
     }
 
