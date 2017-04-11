@@ -93,7 +93,7 @@ public class DefaultBrickStateEventRepositoryTest implements MonitorDataBuilder 
         Set<BrickStateEvent> result = defaultBrickStateEventRepository.compareAndUpdate(removeBrickStateEvents);
 
         //  then
-        BrickStateEvent gitlabUnknow = new BrickStateEvent(projectConfigurationIdentifier, stackName, BrickType.SCM.name(), "gitlab", BrickStateEvent.State.UNKNOWN, "8.13.0-ce.0");
+        BrickStateEvent gitlabUnknow = new BrickStateEvent(projectConfigurationIdentifier, stackName, BrickType.SCM.name(), "gitlab", BrickStateEvent.State.STOPPED, "8.13.0-ce.0");
         assertThat(result).containsOnly(gitlabUnknow);
     }
 
@@ -119,7 +119,7 @@ public class DefaultBrickStateEventRepositoryTest implements MonitorDataBuilder 
         removeBrickStateEvents.add(nexus);
 
         Set<BrickStateEvent> intermediaire = defaultBrickStateEventRepository.compareAndUpdate(removeBrickStateEvents);
-        BrickStateEvent gitlabUnknow = new BrickStateEvent(projectConfigurationIdentifier, stackName, BrickType.SCM.name(), "gitlab", BrickStateEvent.State.UNKNOWN, "8.13.0-ce.0");
+        BrickStateEvent gitlabUnknow = new BrickStateEvent(projectConfigurationIdentifier, stackName, BrickType.SCM.name(), "gitlab", BrickStateEvent.State.STOPPED, "8.13.0-ce.0");
 
         //  when
 

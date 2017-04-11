@@ -1,6 +1,8 @@
 package io.kodokojo.monitor.service;
 
 import io.kodokojo.commons.service.actor.message.BrickStateEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -8,6 +10,8 @@ import java.util.stream.Collectors;
 import static java.util.Objects.requireNonNull;
 
 public class DefaultBrickStateEventRepository implements BrickStateEventRepository {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultBrickStateEventRepository.class);
 
     private Set<BrickStateEvent> cache = new HashSet<>();
 
@@ -36,14 +40,16 @@ public class DefaultBrickStateEventRepository implements BrickStateEventReposito
                 .collect(Collectors.toSet());
         cache.removeAll(toRemove);
         toRemove.forEach(b -> {
+            BrickStateEvent.State state = BrickStateEvent.State.STOPPED;
             BrickStateEvent unknownBrickStateEvent = new BrickStateEvent(
                     b.getProjectConfigurationIdentifier(),
                     b.getStackName(),
                     b.getBrickType(),
                     b.getBrickName(),
-                    BrickStateEvent.State.UNKNOWN,
+                    state,
                     b.getVersion()
             );
+            LOGGER.info("Remove brick {} from projectConfigurationId '{}'; Brick not anymore defined in Marathon. Generating BrickStateEvent {}", b.getBrickName(), b.getProjectConfigurationIdentifier(), state);
             res.add(unknownBrickStateEvent);
         });
 
