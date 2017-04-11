@@ -4,6 +4,7 @@ import akka.actor.AbstractActor;
 import akka.actor.Props;
 import akka.event.LoggingAdapter;
 import akka.japi.pf.ReceiveBuilder;
+import com.google.gson.GsonBuilder;
 import io.kodokojo.commons.event.Event;
 import io.kodokojo.commons.event.EventBuilder;
 import io.kodokojo.commons.event.EventBuilderFactory;
@@ -38,6 +39,9 @@ public class LookupOrchestratorAndFireEventActor extends AbstractActor {
 
             if (isNotEmpty(brickStateEvents)) {
                 LOGGER.info("Sending {} brick state event changed.", brickStateEvents.size());
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("Sending following events: \n{}", new GsonBuilder().setPrettyPrinting().create().toJson(brickStateEvents));
+                }
                 EventBuilder builder = eventBuilderFactory.create();
                 builder.setEventType(Event.BRICK_STATE_UPDATE);
                 brickStateEventsToSend.forEach(brickStateEvent -> {
