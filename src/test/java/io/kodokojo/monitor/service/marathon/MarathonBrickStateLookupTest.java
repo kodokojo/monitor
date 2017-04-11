@@ -2,9 +2,9 @@ package io.kodokojo.monitor.service.marathon;
 
 import io.kodokojo.commons.config.MarathonConfig;
 import io.kodokojo.commons.model.BrickType;
-import io.kodokojo.commons.model.ProjectConfiguration;
 import io.kodokojo.commons.model.ProjectConfigurationBuilder;
 import io.kodokojo.commons.service.DefaultBrickFactory;
+import io.kodokojo.commons.service.DefaultBrickUrlFactory;
 import io.kodokojo.commons.service.actor.message.BrickStateEvent;
 import io.kodokojo.commons.service.repository.ProjectFetcher;
 import io.kodokojo.monitor.service.BrickStateLookup;
@@ -14,7 +14,6 @@ import okhttp3.OkHttpClient;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Set;
 
@@ -46,7 +45,7 @@ public class MarathonBrickStateLookupTest implements MonitorDataBuilder, DataBui
 
     @Test
     public void lookup_simple_healthy_application_test() {
-        BrickStateLookup brickStateLookup = new MarathonBrickStateLookup(marathonConfig, projectFetcher, new DefaultBrickFactory(), httpClient) {
+        BrickStateLookup brickStateLookup = new MarathonBrickStateLookup(marathonConfig, projectFetcher, new DefaultBrickFactory(), new DefaultBrickUrlFactory("kodokojo.dev"), httpClient) {
             @Override
             protected String fetchMarathon() {
                 return fetchJenkinsHealthyMarathonAppsResponse();
@@ -59,7 +58,7 @@ public class MarathonBrickStateLookupTest implements MonitorDataBuilder, DataBui
     @Test
     public void lookup_simple_fail_application_test() {
 
-        BrickStateLookup brickStateLookup = new MarathonBrickStateLookup(marathonConfig, projectFetcher, new DefaultBrickFactory(), httpClient) {
+        BrickStateLookup brickStateLookup = new MarathonBrickStateLookup(marathonConfig, projectFetcher, new DefaultBrickFactory(), new DefaultBrickUrlFactory("kodokojo.dev"), httpClient) {
             @Override
             protected String fetchMarathon() {
                 return fetchJenkinsFailMarathonAppsResponse();
@@ -74,7 +73,7 @@ public class MarathonBrickStateLookupTest implements MonitorDataBuilder, DataBui
     @Test
     public void lookup_simple_running_application_test() {
 
-        BrickStateLookup brickStateLookup = new MarathonBrickStateLookup(marathonConfig, projectFetcher, new DefaultBrickFactory(), httpClient) {
+        BrickStateLookup brickStateLookup = new MarathonBrickStateLookup(marathonConfig, projectFetcher, new DefaultBrickFactory(), new DefaultBrickUrlFactory("kodokojo.dev"), httpClient) {
             @Override
             protected String fetchMarathon() {
                 return fetchJenkinsRunningMarathonAppsResponse();
@@ -88,7 +87,7 @@ public class MarathonBrickStateLookupTest implements MonitorDataBuilder, DataBui
     @Test
     public void lookup_simple_stopped_application_test() {
 
-        BrickStateLookup brickStateLookup = new MarathonBrickStateLookup(marathonConfig, projectFetcher, new DefaultBrickFactory(), httpClient) {
+        BrickStateLookup brickStateLookup = new MarathonBrickStateLookup(marathonConfig, projectFetcher, new DefaultBrickFactory(), new DefaultBrickUrlFactory("kodokojo.dev"), httpClient) {
             @Override
             protected String fetchMarathon() {
                 return fetchJenkinsStoppedMarathonAppsResponse();
@@ -102,7 +101,7 @@ public class MarathonBrickStateLookupTest implements MonitorDataBuilder, DataBui
     @Test
     public void lookup_simple_staged_application_test() {
 
-        BrickStateLookup brickStateLookup = new MarathonBrickStateLookup(marathonConfig, projectFetcher, new DefaultBrickFactory(), httpClient) {
+        BrickStateLookup brickStateLookup = new MarathonBrickStateLookup(marathonConfig, projectFetcher, new DefaultBrickFactory(), new DefaultBrickUrlFactory("kodokojo.dev"), httpClient) {
             @Override
             protected String fetchMarathon() {
                 return fetchJenkinsStageMarathonAppsResponse();
@@ -116,7 +115,7 @@ public class MarathonBrickStateLookupTest implements MonitorDataBuilder, DataBui
     @Test
     public void acceptance_test() {
 
-        BrickStateLookup brickStateLookup = new MarathonBrickStateLookup(marathonConfig, projectFetcher, new DefaultBrickFactory(), httpClient) {
+        BrickStateLookup brickStateLookup = new MarathonBrickStateLookup(marathonConfig, projectFetcher, new DefaultBrickFactory(), new DefaultBrickUrlFactory("kodokojo.dev"), httpClient) {
             @Override
             protected String fetchMarathon() {
                 return fetchAllMarathonAppsResponse();
