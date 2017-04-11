@@ -26,6 +26,7 @@ import io.kodokojo.commons.config.module.*;
 import io.kodokojo.commons.event.EventBus;
 import io.kodokojo.commons.model.BrickType;
 import io.kodokojo.commons.service.BrickFactory;
+import io.kodokojo.commons.service.BrickUrlFactory;
 import io.kodokojo.commons.service.actor.message.BrickStateEvent;
 import io.kodokojo.commons.service.healthcheck.HttpHealthCheckEndpoint;
 import io.kodokojo.commons.service.lifecycle.ApplicationLifeCycleManager;
@@ -111,8 +112,8 @@ public class Launcher {
 
                 @Singleton
                 @Provides
-                BrickStateLookup provideBrickStateLookup(MarathonConfig marathonConfig, ProjectFetcher projectFectcher, BrickFactory brickFactory, OkHttpClient httpClient) {
-                    return new MarathonBrickStateLookup(marathonConfig, projectFectcher, brickFactory, httpClient);
+                BrickStateLookup provideBrickStateLookup(MarathonConfig marathonConfig, ProjectFetcher projectFectcher, BrickFactory brickFactory, BrickUrlFactory brickUrlFactory, OkHttpClient httpClient) {
+                    return new MarathonBrickStateLookup(marathonConfig, projectFectcher, brickFactory , brickUrlFactory, httpClient);
                 }
 
             });

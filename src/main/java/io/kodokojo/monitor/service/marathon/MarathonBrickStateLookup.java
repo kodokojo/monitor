@@ -8,6 +8,7 @@ import io.kodokojo.commons.config.MarathonConfig;
 import io.kodokojo.commons.model.BrickConfiguration;
 import io.kodokojo.commons.model.ProjectConfiguration;
 import io.kodokojo.commons.service.BrickFactory;
+import io.kodokojo.commons.service.BrickUrlFactory;
 import io.kodokojo.commons.service.actor.message.BrickStateEvent;
 import io.kodokojo.commons.service.repository.ProjectFetcher;
 import io.kodokojo.monitor.service.BrickStateLookup;
@@ -38,16 +39,20 @@ public class MarathonBrickStateLookup implements BrickStateLookup {
 
     private final BrickFactory brickFactory;
 
+    private final BrickUrlFactory brickUrlFactory;
+
     private final OkHttpClient httpClient;
 
     @Inject
-    public MarathonBrickStateLookup(MarathonConfig marathonConfig, ProjectFetcher projectFetcher, BrickFactory brickFactory, OkHttpClient httpClient) {
+    public MarathonBrickStateLookup(MarathonConfig marathonConfig, ProjectFetcher projectFetcher, BrickFactory brickFactory, BrickUrlFactory brickUrlFactory, OkHttpClient httpClient) {
         requireNonNull(marathonConfig, "marathonConfig must be defined.");
         requireNonNull(projectFetcher, "projectFetcher must be defined.");
         requireNonNull(brickFactory, "brickFactory must be defined.");
+        requireNonNull(brickUrlFactory, "brickUrlFactory must be defined.");
         requireNonNull(httpClient, "httpClient must be defined.");
         this.projectFetcher = projectFetcher;
         this.brickFactory = brickFactory;
+        this.brickUrlFactory = brickUrlFactory;
         this.marathonConfig = marathonConfig;
         this.httpClient = httpClient;
     }
@@ -108,8 +113,9 @@ public class MarathonBrickStateLookup implements BrickStateLookup {
         BrickConfiguration brickConfiguration = brickFactory.createBrick(brickName);
         String brickType = brickConfiguration.getType().name();
         String version = brickConfiguration.getVersion();
+        String url = brickUrlFactory.forgeUrl(projectConfiguration.getName(), stackName, brickType, brickName);
 
-        return Optional.of(new BrickStateEvent(projectConfigurationId, stackName, brickType, brickName, state, version));
+        return Optional.of(new BrickStateEvent(projectConfigurationId, stackName, brickType, brickName, state, url, version));
     }
 
     private BrickStateEvent.State computeBrickState(JsonObject app) {
