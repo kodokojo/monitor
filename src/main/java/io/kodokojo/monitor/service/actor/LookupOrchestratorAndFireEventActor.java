@@ -36,8 +36,11 @@ public class LookupOrchestratorAndFireEventActor extends AbstractActor {
             LOGGER.debug("Receive a tick.");
             Set<BrickStateEvent> brickStateEvents = brickStateLookup.lookup();
             Set<BrickStateEvent> brickStateEventsToSend = brickStateEventRepository.compareAndUpdate(brickStateEvents);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Receive {} brick event state, generate {} brick state change.", brickStateEvents.size(), brickStateEventsToSend.size());
+            }
 
-            if (isNotEmpty(brickStateEvents)) {
+            if (isNotEmpty(brickStateEventsToSend)) {
                 LOGGER.info("Sending {} brick state event changed.", brickStateEvents.size());
                 if (LOGGER.isDebugEnabled()) {
                     LOGGER.debug("Sending following events: \n{}", new GsonBuilder().setPrettyPrinting().create().toJson(brickStateEvents));
@@ -45,8 +48,13 @@ public class LookupOrchestratorAndFireEventActor extends AbstractActor {
                 EventBuilder builder = eventBuilderFactory.create();
                 builder.setEventType(Event.BRICK_STATE_UPDATE);
                 brickStateEventsToSend.forEach(brickStateEvent -> {
-                    builder.setPayload(brickStateEvent);
-                    eventBus.send(builder.build());
+                    builder.addCustomHeader(Event.PROJECTCONFIGURATION_ID_CUSTOM_HEADER, brickStateEvent.getProjectConfigurationIdentifier())
+                            .setPayload(brickStateEvent);
+                    Event event = builder.build();
+                    if (LOGGER.isDebugEnabled()) {
+                        LOGGER.debug("Broadcasting event :{}", Event.convertToPrettyJson(event));
+                    }
+                    eventBus.send(event);
                 });
             }
         }).matchAny(this::unhandled)

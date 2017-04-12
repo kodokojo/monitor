@@ -6,6 +6,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import io.kodokojo.commons.config.MarathonConfig;
 import io.kodokojo.commons.model.BrickConfiguration;
+import io.kodokojo.commons.model.Project;
 import io.kodokojo.commons.model.ProjectConfiguration;
 import io.kodokojo.commons.service.BrickFactory;
 import io.kodokojo.commons.service.BrickUrlFactory;
@@ -26,8 +27,10 @@ import java.util.Base64;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static java.util.Objects.requireNonNull;
+import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 
 public class MarathonBrickStateLookup implements BrickStateLookup {
 
@@ -108,8 +111,23 @@ public class MarathonBrickStateLookup implements BrickStateLookup {
         if (projectConfiguration == null) {
             return Optional.empty();
         }
+
         String projectConfigurationId = projectConfiguration.getIdentifier();
         String stackName = projectConfiguration.getDefaultStackConfiguration().getName();
+        Project project = projectFetcher.getProjectByProjectConfigurationId(projectConfigurationId);
+        AtomicBoolean isStartingByBrickManager = new AtomicBoolean(false);
+        if (project != null && isNotEmpty(project.getStacks())) {
+            project.getStacks().stream()
+                    .filter(s -> s.getName().equals(stackName))
+                    .flatMap( s -> s.getBrickStateEvents().stream())
+                    .filter(b -> b.getBrickName().equals(brickName) && b.getState() == BrickStateEvent.State.STARTING || b.getState() == BrickStateEvent.State.CONFIGURING)
+                    .findFirst()
+                    .ifPresent(b -> isStartingByBrickManager.set(true));
+        }
+        if (isStartingByBrickManager.get()) {
+            return Optional.empty();
+        }
+
         BrickConfiguration brickConfiguration = brickFactory.createBrick(brickName);
         String brickType = brickConfiguration.getType().name();
         String version = brickConfiguration.getVersion();
